@@ -2,11 +2,18 @@ using UnityEngine;
 
 public class GridCell : MonoBehaviour
 {
-    private HexStack stack;
+    private HexStack _stack;
+
+    public HexStack Stack => _stack;
 
     public bool IsOccupied 
     { 
-        get => stack != null;
+        get => _stack != null;
         private set { }
+    }
+
+    public void AssignStack(HexStack stack)
+    {
+        _stack = stack;
     }
 }

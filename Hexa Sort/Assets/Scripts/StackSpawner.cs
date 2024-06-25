@@ -15,9 +15,34 @@ public class StackSpawner : MonoBehaviour
     [SerializeField] private Vector2Int minMaxHexCount;
     [SerializeField] private Color[] _colors;
 
+    private int _stackCounter;
+
+    private void Awake()
+    {
+        Application.targetFrameRate = 60;
+
+        StackController.OnStackPlaced += StackPlacedHandler;
+    }
+
+    private void OnDestroy()
+    {
+        StackController.OnStackPlaced -= StackPlacedHandler;
+    }
+
     private void Start()
     {
         GenerateStacks();
+    }
+
+    private void StackPlacedHandler(GridCell gridCell)
+    {
+        _stackCounter++;
+
+        if (_stackCounter >= 3)
+        {
+            _stackCounter = 0;
+            GenerateStacks();
+        }
     }
 
     private void GenerateStacks()

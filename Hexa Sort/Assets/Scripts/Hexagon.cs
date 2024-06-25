@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class Hexagon : MonoBehaviour
@@ -6,6 +7,7 @@ public class Hexagon : MonoBehaviour
 
     [Header("Elements")]
     [SerializeField] private Renderer _renderer;
+    [SerializeField] private Collider _collider;
 
     public Color Color
     {
@@ -16,5 +18,29 @@ public class Hexagon : MonoBehaviour
     public void Configure(HexStack hexStack)
     {
         HexStack = hexStack;
+    }
+
+    public void SetParent(Transform parent)
+    {
+        transform.SetParent(parent);
+    }
+
+    public void DisableCollider() => _collider.enabled = false;
+
+    public void MoveToLocal(Vector3 targetLocalPosition)
+    {
+        LeanTween.moveLocal(gameObject, targetLocalPosition, .2f)
+            .setEase(LeanTweenType.easeInOutSine)
+            .setDelay(transform.GetSiblingIndex() * .01f);
+    }
+
+    public void Vanish(float delay)
+    {
+        LeanTween.cancel(gameObject);
+
+        LeanTween.scale(gameObject, Vector3.zero, .2f)
+            .setEase(LeanTweenType.easeInBack)
+            .setDelay(delay)
+            .setOnComplete(() => Destroy(gameObject));
     }
 }

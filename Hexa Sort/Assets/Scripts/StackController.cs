@@ -1,7 +1,11 @@
+using System;
+using UnityEditor;
 using UnityEngine;
 
 public class StackController : MonoBehaviour
 {
+    public static Action<GridCell> OnStackPlaced;
+
     [Header("Settings")]
     [SerializeField] private LayerMask _hexagonLayerMask;
     [SerializeField] private LayerMask _gridHexagonLayerMask;
@@ -9,6 +13,7 @@ public class StackController : MonoBehaviour
 
     private HexStack _currentStack;
     private Vector3 _currentStackInitialPos;
+    private GridCell _targetCell;
 
     private void Update()
     {
@@ -78,6 +83,8 @@ public class StackController : MonoBehaviour
             _currentStack.transform.position, 
             currentStackTargetPos, 
             Time.deltaTime * 30f);
+
+        _targetCell = null;
     }
 
     private void DraggingAboveGridCell(RaycastHit hit)
@@ -102,11 +109,30 @@ public class StackController : MonoBehaviour
             _currentStack.transform.position,
             currentStackTargetPos,
             Time.deltaTime * 30f);
+
+        _targetCell = gridCell;
     }
 
     private void ManageMouseUp()
     {
-        
+        if (_targetCell == null)
+        {
+            _currentStack.transform.position = _currentStackInitialPos;
+            _currentStack = null;
+
+            return;
+        }
+
+        _currentStack.transform.position = _targetCell.transform.position.With(y: .2f);
+        _currentStack.transform.SetParent(_targetCell.transform);
+        _currentStack.Place();
+
+        _targetCell.AssignStack(_currentStack);
+
+        OnStackPlaced?.Invoke(_targetCell);
+
+        _targetCell = null;
+        _currentStack = null;
     }
 
     private Ray GetClickedRay() => Camera.main.ScreenPointToRay(Input.mousePosition);
