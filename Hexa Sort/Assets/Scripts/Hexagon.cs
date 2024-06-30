@@ -29,9 +29,20 @@ public class Hexagon : MonoBehaviour
 
     public void MoveToLocal(Vector3 targetLocalPosition)
     {
+        LeanTween.cancel(gameObject);
+
+        float delay = transform.GetSiblingIndex() * .01f;
+
         LeanTween.moveLocal(gameObject, targetLocalPosition, .2f)
             .setEase(LeanTweenType.easeInOutSine)
-            .setDelay(transform.GetSiblingIndex() * .01f);
+            .setDelay(delay);
+
+        Vector3 direction = (targetLocalPosition - transform.localPosition).With(y: 0).normalized;
+        Vector3 rotationAxis = Vector3.Cross(Vector3.up, direction);
+
+        LeanTween.rotateAround(gameObject, rotationAxis, 180f, .2f)
+            .setEase(LeanTweenType.easeInOutSine)
+            .setDelay(delay);
     }
 
     public void Vanish(float delay)
